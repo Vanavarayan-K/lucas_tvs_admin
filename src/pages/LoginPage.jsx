@@ -4,29 +4,69 @@ import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { login } from "../slices/authslice";
 import { useNavigate } from "react-router-dom";
+import { loginService } from "../_services/login";
+import Logo from '../assets/lucasLogo.png';
+import React, { useState } from "react";
+import SnackBar from "../components/SnackBar/SnackBar";
+import Cookies from 'universal-cookie'
 
 const schema = Yup.object({
     username: Yup.string().required("Required"),
     password: Yup.string().required("Required"),
 });
 
+const cookies = new Cookies();
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [open,setOpen]=useState(false);
+    const [snackbarTitle,setSnackbarTitle]=useState("");
+    const [severity,setSeverity]=useState("success");
+
+
+    const onClose=()=>{
+        setOpen(false);
+    }   
+    const handleLogin = async (values) => {
+        try {
+            await loginService.userLogin(values).then((res) => {
+                if (res && res?.status === 200) {
+                    dispatch(login({ token: res.data.data.token, role: res.data.data.user,user:res.data.data.userName }));
+                    cookies.set("token", res.data.data.token);
+                    navigate('/dashboard');
+                } else {
+                    setSeverity("error");
+                    setSnackbarTitle(res.data.message || "Login failed");
+                    setOpen(true);
+                }
+            }).catch((err) => {
+                setSeverity("error");
+                setSnackbarTitle("Login failed");
+                setOpen(true);
+                // alert("An error occurred during login. Please try again.");
+            });   
+        } catch (error) {
+            setOpen(true);
+            setSeverity("error");
+            setSnackbarTitle("An error occurred during login. Please try again.");
+        }
+    }
 
     return (
         <Container maxWidth="sm">
             <Card sx={{ mt: 10, p: 3, display: "flex", flexDirection: "column", alignItems: "center",borderRadius:3,boxShadow:3 }}>
                 <Box  sx={{ mt: 10, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <img src='  https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4lNFsQMRmNoyUmcgoqMfGy9QomyZyUmCPJw&s' width={200} alt="Logo" className="logo" />
+                    <img src={Logo} width={200} alt="Logo" className="logo" />
                     <Typography variant="h5" sx={{fontSize:'20px',fontWeight:'bold',mt:5}}>Login</Typography>
                     <Formik
                         initialValues={{ username: "", password: "" }}
                         validationSchema={schema}
                         onSubmit={(values) => {
-                            dispatch(login({ token: "fake-token", role: "admin" }));
-                            onLogin();
+                            // dispatch(login({ token: "fake-token", role: "admin" }));
+                            // onLogin();
+                            handleLogin(values);
+                            // dispatch(login({ token: "fake-token", role: "admin" }));
                         }}
                     >
                         {({ values, handleChange, errors, touched }) => (
@@ -43,6 +83,7 @@ export default function LoginPage({ onLogin }) {
                 </Box>
 
             </Card>
+            <SnackBar open={open} severity={severity} snackbarTitle={snackbarTitle} onClose={onClose} />
         </Container>
     );
 }

@@ -1,26 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Avatar, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-
+import { userService } from "../_services/users";
+import SessionExpired from "../components/SessionExpired";
+import SnackBar from "../components/SnackBar/SnackBar";
 export default function ProfilePage() {
     const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [profileDetails,setProfileDetails] = useState({});
+    const [sessionExpired, setSessionExpired] = useState(false);
+    const [snackbarTitle, setSnackbarTitle] = useState("");
+    const [severity, setSeverity] = useState("success");    
+    const [isOpen,setIsOpen] = useState(false);
 
-    const user = {
-        name: "John Doe",
-        email: "john.doe@example.com",
-        contact: "123-456-7890",
-        address: "123 Main St, Springfield, USA",
-        avatar: "J"
-    };
+    const onClose=()=>{
+        setIsOpen(false);
+    }
+    useEffect(() => {   
+        // Fetch profile details from API if needed
+        getProfileDetails();
+        }, []);
 
+        const getProfileDetails = () => {
+            // Simulate API call
+            userService.getProfileInfo().then((res) => {
+                if(res && res.status === 200){
+                    let data = res.data.data;
+                    setProfileDetails({
+                        name: data.userName,
+                        email: data.email,
+                        contact: data.mobile,
+                        roleId: data.roleId,
+                        portalIds: data.portalIds,
+                        id: data.userId,
+                    });
+                }if(res.status ===401){
+                    // Handle session expiration if needed
+                    setSessionExpired(true);
+                }
+                else{
+                    // Handle error response if needed
+                }
+            });
+        };  
     const validationSchema = Yup.object({
         name: Yup.string().required("Name is required"),
         email: Yup.string().email("Invalid email").required("Email is required"),
         contact: Yup.string().required("Contact is required"),
-        address: Yup.string().required("Address is required"),
     });
-
     const handleEditOpen = () => {
         setEditDialogOpen(true);
     };
@@ -30,8 +57,30 @@ export default function ProfilePage() {
     };
 
     const handleFormSubmit = (values) => {
-        console.log("Updated User Details:", values);
-        handleEditClose();
+        userService.updateProfile({
+            name: values.name,
+            email: values.email,
+            mobile: values.contact
+        }).then((res) => {
+            if(res && res.status === 200){
+                getProfileDetails();
+                setEditDialogOpen(false);
+                setSeverity("success");
+                setSnackbarTitle("Profile updated successfully");
+                setIsOpen(true);
+                  // Handle successful response if needed
+                }else if(res.status ===401){
+                    // Handle session expiration if needed
+                    setSessionExpired(true);
+                } else{
+                    setSeverity("error");
+                    setSnackbarTitle(res.data.message || "Failed to update profile");
+                    setIsOpen(true);
+
+                    // Handle error response if needed  
+            } 
+                // Handle successful update if needed
+        });
     };
 
     return (
@@ -39,16 +88,16 @@ export default function ProfilePage() {
             <Card sx={{ width: 500, boxShadow: 3, borderRadius: 2 }}>
                 <CardContent >
                     <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
-                        <Avatar  sx={{ width: 100, height: 100, mr: 3 ,bgcolor: 'deepskyblue',fontSize:32 }}  >{user.avatar}</Avatar>
+                        <Avatar  sx={{ width: 100, height: 100, mr: 3 ,bgcolor: 'deepskyblue',fontSize:32 }}  >{profileDetails.avatar}</Avatar>
                         <Box>
-                            <Typography variant="h5">{user.name}</Typography>
-                            <Typography variant="body1" color="textSecondary">{user.email}</Typography>
-                            <Typography variant="body1" color="textSecondary">{user.contact}</Typography>
-                            <Typography variant="body1" color="textSecondary">{user.address}</Typography>
+                            <Typography variant="h5">{profileDetails.name}</Typography>
+                            <Typography variant="body1" color="textSecondary">{profileDetails.email}</Typography>
+                            <Typography variant="body1" color="textSecondary">{profileDetails.contact}</Typography>
+                            <Typography variant="body1" color="textSecondary">{profileDetails.address}</Typography>
                         </Box>
                     </Box>
                     <Box sx={{textAlign:'center'}}>
-                    <Button variant="contained" sx={{}} onClick={handleEditOpen}>Edit</Button>
+                    <Button variant="contained"  onClick={handleEditOpen}>Edit</Button>
                     </Box>
                 </CardContent>
             </Card>
@@ -57,15 +106,16 @@ export default function ProfilePage() {
                 <DialogTitle sx={{fontWeight:'bold',fontSize:'14px'}}>Edit User Details</DialogTitle>
                 <Formik
                     initialValues={{
-                        name: user.name,
-                        email: user.email,
-                        contact: user.contact,
-                        address: user.address,
+                        name: profileDetails.name,
+                        email: profileDetails.email,
+                        contact: profileDetails.contact
                     }}
                     validationSchema={validationSchema}
-                    onSubmit={handleFormSubmit}
+                    onSubmit={(values)=>{
+                        handleFormSubmit(values)
+                    }}
                 >
-                    {({ errors, touched }) => (
+                    {({ errors, touched,values,handleChange,isSubmitting }) => (
                         <Form>
                             <DialogContent>
                                 <Box sx={{ mb: 2 }}>
@@ -74,6 +124,8 @@ export default function ProfilePage() {
                                         name="name"
                                         label="Name"
                                         fullWidth
+                                        value={values.name}
+                                        onChange={handleChange}
                                         error={touched.name && Boolean(errors.name)}
                                         helperText={touched.name && errors.name}
                                     />
@@ -84,6 +136,8 @@ export default function ProfilePage() {
                                         name="email"
                                         label="Email"
                                         fullWidth
+                                        value={values.email}
+                                        onChange={handleChange}
                                         error={touched.email && Boolean(errors.email)}
                                         helperText={touched.email && errors.email}
                                     />
@@ -94,29 +148,23 @@ export default function ProfilePage() {
                                         name="contact"
                                         label="Contact"
                                         fullWidth
+                                        onChange={handleChange}
+                                        value={values.contact}
                                         error={touched.contact && Boolean(errors.contact)}
                                         helperText={touched.contact && errors.contact}
-                                    />
-                                </Box>
-                                <Box sx={{ mb: 2 }}>
-                                    <Field
-                                        as={TextField}
-                                        name="address"
-                                        label="Address"
-                                        fullWidth
-                                        error={touched.address && Boolean(errors.address)}
-                                        helperText={touched.address && errors.address}
                                     />
                                 </Box>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={handleEditClose} color="">Cancel</Button>
-                                <Button type="submit" variant="contained" color="primary">Save</Button>
+                                <Button disabled={isSubmitting} variant="contained" color="primary" type="submit">Save</Button>
                             </DialogActions>
                         </Form>
                     )}
                 </Formik>
             </Dialog>
+            <SnackBar open={isOpen} severity={severity} snackbarTitle={snackbarTitle} onClose={onClose} />
+            <SessionExpired open={sessionExpired} />
         </Box>
     );
 }

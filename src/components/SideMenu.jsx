@@ -11,7 +11,7 @@ export default function SideMenu() {
 
     const menuItems = [
         { text: "Users", icon: <DashboardIcon />, path: "/dashboard" },
-        { text: "Logs", icon: <ListAltIcon />, path: "/logs" }
+        // { text: "Logs", icon: <ListAltIcon />, path: "/logs" }
     ];
 
     return (

@@ -4,9 +4,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { logoutUser } from "../slices/authslice";
-
+import Logo from '../assets/lucasLogo.png'
 export default function Header() {
-    const user = useSelector((state) => state.auth.user);
+    const user = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -55,13 +55,13 @@ export default function Header() {
         <>
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                 <Toolbar>
-                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                        Lucas TVS
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2,flexGrow: 1 }}>
+                        <img src={Logo} alt="Logo" style={{ height: 40 }} />
+                    </Box>
                     <Box>
                         <IconButton onClick={handleAvatarClick} sx={{ p: 0 }}>
                             <Avatar sx={{ bgcolor: "" }}>
-                                {user?.name ? user.name.charAt(0).toUpperCase() : "G"}
+                                {user?.role ? user?.role?.username.charAt(0).toUpperCase() : "G"}
                             </Avatar>
                         </IconButton>
                         <Menu

@@ -13,6 +13,7 @@ const store = configureStore({
     audit: auditReducer,
   },
   preloadedState: persisted,
+  
 });
 
 // persist on change
