@@ -1,8 +1,4 @@
-import axios from 'axios'
-import { helpers } from '../_helpers/index.js';
-import { data } from 'react-router-dom';
-
-
+import api from './api';
 
 //default header and api endpoint config
 export const userService = {
@@ -18,14 +14,8 @@ export const userService = {
 };
 
 async function getAllUsers(data) {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
-    helpers.setHeader();
     try {
-        const res = await axios.get(`/users/?page=${data.page}&limit=${data.pageSize}`, requestOptions);
+        const res = await api.get(`users/?page=${data.page}&limit=${data.pageSize}`);
         return res;
     } catch (error) {
         return error.response;
@@ -33,56 +23,35 @@ async function getAllUsers(data) {
 }
 
 async function createUser(data) {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
     try {
-        const res = await axios.post(`/users/with-portal`, data, requestOptions);
+        const res = await api.post(`users/with-portal`, data);
         return res;
     } catch (error) {
         return error.response;
     }
-} 
+}
 
 async function updateUser(id, data) {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
     try {
-        const res = await axios.put(`/users/${id}/with-portal`, data, requestOptions);
+        const res = await api.put(`users/${id}/with-portal`, data);
         return res;
     } catch (error) {
         return error.response;
     }
-} 
+}
 
 async function deleteUser(id) {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
     try {
-        const res = await axios.delete(`/users/${id}/with-portal`, requestOptions);
+        const res = await api.delete(`users/${id}/with-portal`);
         return res;
-    } catch (error) {       
+    } catch (error) {
         return error.response;
     }
-}   
+}
 
 async function getPortalData() {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
-    helpers.setHeader();
     try {
-        const res = await axios.get(`/portals`, requestOptions);
+        const res = await api.get(`portals`);
         return res;
     } catch (error) {
         return error.response;
@@ -90,14 +59,8 @@ async function getPortalData() {
 }
 
 async function getUserRoles() {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
-    helpers.setHeader();
     try {
-        const res = await axios.get(`/roles`, requestOptions);
+        const res = await api.get(`roles`);
         return res;
     } catch (error) {
         return error.response;
@@ -105,14 +68,8 @@ async function getUserRoles() {
 }
 
 async function getProfileInfo() {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
-    helpers.setHeader();
     try {
-        const res = await axios.get(`/auth/me`, requestOptions);
+        const res = await api.get(`auth/me`);
         return res;
     } catch (error) {
         return error.response;
@@ -120,29 +77,17 @@ async function getProfileInfo() {
 }
 
 async function changePassword(data) {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
-    helpers.setHeader();
     try {
-        const res = await axios.post(`/auth/change-password`, data, requestOptions);
+        const res = await api.post(`auth/change-password`, data);
         return res;
     } catch (error) {
         return error.response;
     }
-} 
+}
 
 async function updateProfile(data) {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
-    helpers.setHeader();
     try {
-        const res = await axios.put(`/auth/me`,data, requestOptions);
+        const res = await api.put(`auth/me`, data);
         return res;
     } catch (error) {
         return error.response;

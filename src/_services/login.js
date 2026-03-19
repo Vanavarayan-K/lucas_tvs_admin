@@ -1,6 +1,4 @@
-import { Foggy } from '@mui/icons-material';
-import axios from 'axios'
-
+import api from './api';
 
 //default header and api endpoint config
 export const loginService = {
@@ -10,14 +8,8 @@ export const loginService = {
 };
 
 async function userLogin(data) {
-    console.log(data)
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
     try {
-        const res = await axios.post(`/auth/login`, data, requestOptions);
+        const res = await api.post(`auth/login`, data);
         return res;
     } catch (error) {
         return error.response;
@@ -25,13 +17,8 @@ async function userLogin(data) {
 }
 
 async function forgotPassword(data) {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
     try {
-        const res = await axios.post(`/auth/forgot-password`, data, requestOptions);
+        const res = await api.post(`auth/forgot-password`, data);
         return res;
     } catch (error) {
         return error.response;
@@ -39,16 +26,10 @@ async function forgotPassword(data) {
 }
 
 async function resetPassword(data) {
-    const requestOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };  
     try {
-        const res = await axios.post(`/auth/reset-password`, data, requestOptions);
+        const res = await api.post(`auth/reset-password`, data);
         return res;
     } catch (error) {
         return error.response;
     }
 }
-
