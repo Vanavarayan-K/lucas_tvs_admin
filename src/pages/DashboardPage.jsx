@@ -40,6 +40,7 @@ export default function DashboardPage({ onLogs }) {
                  contact:user.mobile,
                  role:user.roleName,
                  portal:user.portalNames,
+                 password:user.password || '',
                }))
                
                setUsers(data);
@@ -64,7 +65,7 @@ export default function DashboardPage({ onLogs }) {
             address:values.address,
             roleId:[values.role.id],
             portalIds:[values.portal.id],
-            password:values?.password,
+            ...(values.password ? { password: values.password } : {}),
             "userProfile": {
                 "avatar": "default.png",
                 "department": "Sales"

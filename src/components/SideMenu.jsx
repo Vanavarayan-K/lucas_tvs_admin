@@ -1,17 +1,16 @@
 import React from "react";
 import { Drawer, List, ListItem, ListItemText, ListItemIcon } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import ListAltIcon from "@mui/icons-material/ListAlt";
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import SecurityIcon from "@mui/icons-material/Security";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SideMenu() {
     const navigate = useNavigate();
-    const userRole = useSelector((state) => state.auth.user?.role || "Guest"); // Replace with actual role from Redux
+    const location = useLocation();
 
     const menuItems = [
         { text: "Users", icon: <DashboardIcon />, path: "/dashboard" },
-        // { text: "Logs", icon: <ListAltIcon />, path: "/logs" }
+        { text: "Roles", icon: <SecurityIcon />, path: "/roles" },
     ];
 
     return (
@@ -27,7 +26,10 @@ export default function SideMenu() {
             <List>
                 {menuItems.map((item) => (
                     <ListItem
-                        sx={{cursor:'pointer'}}
+                        sx={{
+                            cursor: 'pointer',
+                            backgroundColor: location.pathname === item.path ? 'action.selected' : 'transparent',
+                        }}
                         button
                         key={item.text}
                         onClick={() => navigate(item.path)}

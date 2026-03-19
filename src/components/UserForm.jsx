@@ -1,4 +1,5 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete, InputAdornment, IconButton } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
@@ -15,6 +16,7 @@ export default function UserForm({ open, handleClose, initialValues,handleSubmit
     const [snackbarTitle, setSnackbarTitle] = React.useState("");
     const [severity, setSeverity] = React.useState("success");
     const [isOpen, setIsOpen] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
     const isEdit = Boolean(initialValues?.id);
     const users = useSelector((state) => state.users.list);
     const validationSchema = Yup.object({
@@ -62,6 +64,7 @@ export default function UserForm({ open, handleClose, initialValues,handleSubmit
     };
    initialValues  = initialValues ? {
        ...initialValues,
+        password: '',  // never pre-fill password on edit
         portal: portal.find((p) => p.name === initialValues.portal),
         role: userRoles.find((role) => role.name === initialValues.role) || null,
     } : null;
@@ -78,8 +81,8 @@ export default function UserForm({ open, handleClose, initialValues,handleSubmit
                 {({ values, handleChange, setFieldValue, errors, touched }) => (
                     <Form>
                         <DialogContent>
-                            
-                            {Object.keys(values).filter(k => k !== "id").map((field) => (
+
+                            {Object.keys(values).filter(k => k !== "id" && k !== "password").map((field) => (
                                 field === "role"  ? (
                                     <Autocomplete
                                         key={field}
@@ -100,7 +103,7 @@ export default function UserForm({ open, handleClose, initialValues,handleSubmit
                                         )}
                                     />
                                 ) : field === 'portal' ?
-                                
+
                                     <Autocomplete
                                         key={field}
                                         options={portal}
@@ -133,6 +136,28 @@ export default function UserForm({ open, handleClose, initialValues,handleSubmit
                                     />
                                 )
                             ))}
+
+                            {/* Password field — required on create, optional on edit */}
+                            <TextField
+                                margin="dense"
+                                name="password"
+                                label={isEdit ? "New Password (leave blank to keep current)" : "Password"}
+                                fullWidth
+                                type={showPassword ? "text" : "password"}
+                                value={values.password || ""}
+                                onChange={handleChange}
+                                error={touched.password && Boolean(errors.password)}
+                                helperText={touched.password && errors.password}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton size="small" onClick={() => setShowPassword((s) => !s)}>
+                                                {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
                         </DialogContent>
                         <DialogActions>
                             <Button color="" sx={{}} onClick={handleClose}>Cancel</Button>
