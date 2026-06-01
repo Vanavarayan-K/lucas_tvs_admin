@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from "./pages/ResetPassword";
 import RolesPage from "./pages/RolesPage";
+import ReportsPage from "./pages/ReportsPage";
 
 export default function App() {
     const token = useSelector((state) => state.auth.token);
@@ -29,6 +30,7 @@ export default function App() {
                         <Route path="/logs" element={<LogsPage />} />
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path="/roles" element={<RolesPage />} />
+                        <Route path="/reports" element={<ReportsPage />} />
                         <Route path="*" element={<Navigate to="/dashboard" replace />} />
                         <Route path="change-password" element={<ChangePassword />} />
                     </Routes>

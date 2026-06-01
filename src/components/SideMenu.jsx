@@ -2,6 +2,7 @@ import React from "react";
 import { Drawer, List, ListItem, ListItemText, ListItemIcon } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SecurityIcon from "@mui/icons-material/Security";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SideMenu() {
@@ -11,6 +12,7 @@ export default function SideMenu() {
     const menuItems = [
         { text: "Users", icon: <DashboardIcon />, path: "/dashboard" },
         { text: "Roles", icon: <SecurityIcon />, path: "/roles" },
+        { text: "Reports", icon: <AssessmentIcon />, path: "/reports" },
     ];
 
     return (
